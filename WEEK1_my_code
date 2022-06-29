@@ -1,0 +1,192 @@
+setwd("/Users/tomasnovak/Desktop/Data\ Analytics")
+
+library(data.table)
+library(haven)
+library(dplyr)
+library(tidyr)
+
+# Load the Data
+data1925_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0012/35206-0012-Data.dta")
+data1930_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0013/35206-0013-Data.dta")
+data1940_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0016/35206-0016-Data.dta")
+data1945_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0020/35206-0020-Data.dta")
+data1950_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0021/35206-0021-Data.dta")
+data1954_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0025/35206-0025-Data.dta")
+data1954_2 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0026/35206-0026-Data.dta")
+data1959_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0027/35206-0027-Data.dta")
+data1959_2 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0028/35206-0028-Data.dta")
+data1964_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0030/35206-0030-Data.dta")
+data1969_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0033/35206-0033-Data.dta")
+data1974_1 <- read_dta("/Users/tomasnovak/Desktop/Data/Data/ICPSR_35206/DS0036/35206-0036-Data.dta")
+
+# Add column "YEAR"
+data1925_1 <- cbind(YEAR = 1925, data1925_1)
+data1930_1 <- cbind(YEAR = 1930, data1930_1)
+data1940_1 <- cbind(YEAR = 1940, data1940_1)
+data1945_1 <- cbind(YEAR = 1945, data1945_1)
+data1950_1 <- cbind(YEAR = 1950, data1950_1)
+data1954_1 <- cbind(YEAR = 1954, data1954_1)
+data1954_2 <- cbind(YEAR = 1954, data1954_2)
+data1959_1 <- cbind(YEAR = 1959, data1959_1)
+data1959_2 <- cbind(YEAR = 1959, data1959_2)
+data1964_1 <- cbind(YEAR = 1964, data1964_1)
+data1969_1 <- cbind(YEAR = 1969, data1969_1)
+data1974_1 <- cbind(YEAR = 1974, data1974_1)
+
+# Extract the County Level Data
+data1925_1 <- subset(data1925_1, LEVEL == 1)
+data1930_1 <- subset(data1930_1, LEVEL == 1)
+data1940_1 <- subset(data1940_1, LEVEL == 1)
+data1945_1 <- subset(data1945_1, LEVEL == 1)
+data1950_1 <- subset(data1950_1, LEVEL == 1)
+data1954_1 <- subset(data1954_1, LEVEL == 1)
+data1954_2 <- subset(data1954_2, LEVEL == 1)
+data1959_1 <- subset(data1959_1, LEVEL == 1)
+data1959_2 <- subset(data1959_2, LEVEL == 1)
+data1964_1 <- subset(data1964_1, LEVEL == 1)
+data1969_1 <- subset(data1969_1, LEVEL == 1)
+data1974_1 <- subset(data1974_1, LEVEL == 1)
+
+# Rename Columns
+data1925_1 <- rename(data1925_1, TOTPOP = VAR1)
+data1925_1 <- rename(data1925_1, FARM_LAND_ACR = VAR38)
+data1925_1 <- rename(data1925_1, HARVEST_CROPLAND = VAR53)
+
+data1930_1 <- rename(data1930_1, TOTPOP = VAR1)
+data1930_1 <- rename(data1930_1, FARM_LAND_ACR = VAR8)
+data1930_1 <- rename(data1930_1, HARVEST_CROPLAND = VAR13)
+
+data1940_1 <- rename(data1940_1, TOTPOP = VAR1)
+data1940_1 <- rename(data1940_1, FARM_LAND_ACR = VAR7)
+data1940_1 <- rename(data1940_1, HARVEST_CROPLAND = VAR10)
+
+data1945_1 <- rename(data1945_1, TOTPOP = TOTPOP40)
+data1945_1 <- rename(data1945_1, FARM_LAND_ACR = VAR4)
+data1945_1 <- rename(data1945_1, HARVEST_CROPLAND = VAR9)
+
+data1950_1 <- rename(data1950_1, FARM_LAND_ACR = VAR8)
+data1950_1 <- rename(data1950_1, HARVEST_CROPLAND = VAR15)
+
+data1954_1 <- rename(data1954_1, TOTPOP = TOTPOP50)
+data1954_1 <- rename(data1954_1, FARM_LAND_ACR = VAR8)
+data1954_1 <- rename(data1954_1, HARVEST_CROPLAND = VAR14)
+
+data1954_2 <- rename(data1954_2, FARM_LAND_ACR = ITEM004)
+data1954_2 <- rename(data1954_2, HARVEST_CROPLAND = ITEM006)
+
+data1959_1 <- rename(data1959_1, TOTPOP = TOTPOP60)
+data1959_1 <- rename(data1959_1, FARM_LAND_ACR = VAR5)
+data1959_1 <- rename(data1959_1, HARVEST_CROPLAND = VAR11)
+
+data1959_2 <- rename(data1959_2, FARM_LAND_ACR = ITEM004)
+data1959_2 <- rename(data1959_2, HARVEST_CROPLAND = ITEM006)
+
+data1964_1 <- rename(data1964_1, TOTPOP = TOTPOP60)
+data1964_1 <- rename(data1964_1, FARM_LAND_ACR = VAR4)
+data1964_1 <- rename(data1964_1, HARVEST_CROPLAND = VAR10)
+
+data1969_1 <- rename(data1969_1, FARM_LAND_ACR = ITEM01002)
+data1969_1 <- rename(data1969_1, HARVEST_CROPLAND = ITEM01038)
+
+data1974_1 <- rename(data1974_1, FARM_LAND_ACR = ITEM01002)
+data1974_1 <- rename(data1974_1, HARVEST_CROPLAND = ITEM01038)
+
+
+# Merge Data Files to Get Missing FIPS
+data1954_1 <- left_join(data1954_1, data1954_2, by=c("FARM_LAND_ACR", "HARVEST_CROPLAND"))
+data1959_1 <- left_join(data1959_1, data1959_2, by=c("FARM_LAND_ACR", "HARVEST_CROPLAND"))
+
+# Remove Data You Don't Need Anymore
+rm(data1954_2)
+rm(data1959_2)
+
+# Extract the Variables You Want
+data1925_1 <- data1925_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1930_1 <- data1930_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1940_1 <- data1940_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1945_1 <- data1945_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1950_1 <- data1950_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1954_1 <- data1954_1[, c("YEAR.x","FIPS", "STATEICP", "LEVEL.x", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1959_1 <- data1959_1[, c("YEAR.x","FIPS", "STATEICP", "LEVEL.x", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1964_1 <- data1964_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "FARM_LAND_ACR", "HARVEST_CROPLAND")]
+data1969_1 <- data1969_1[, c("YEAR","FIPS", "STATE", "LEVEL", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+data1974_1 <- data1974_1[, c("YEAR","FIPS", "STATE", "LEVEL", "FARM_LAND_ACR", "HARVEST_CROPLAND")] 
+
+# Search for colnames (exist?)
+"FIPS" %in% names(data1964_1)
+
+# Delete Rows with Missing the Values Were Interested in
+data1925_1 <- data1925_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1925_1 <- data1925_1[data1925_1$TOTPOP != 0, ]
+data1925_1 <- data1925_1[data1925_1$FARM_LAND_ACR != 0, ]
+data1925_1 <- data1925_1[data1925_1$HARVEST_CROPLAND != 0, ]
+
+data1930_1 <- data1930_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1930_1 <- data1930_1[data1930_1$TOTPOP != 0, ]
+data1930_1 <- data1930_1[data1930_1$FARM_LAND_ACR != 0, ]
+data1930_1 <- data1930_1[data1930_1$HARVEST_CROPLAND != 0, ]
+
+data1940_1 <- data1940_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1940_1 <- data1940_1[data1940_1$TOTPOP != 0, ]
+data1940_1 <- data1940_1[data1940_1$FARM_LAND_ACR != 0, ]
+data1940_1 <- data1940_1[data1940_1$HARVEST_CROPLAND != 0, ]
+
+data1945_1 <- data1945_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1945_1 <- data1945_1[data1945_1$TOTPOP != 0, ]
+data1945_1 <- data1945_1[data1945_1$FARM_LAND_ACR != 0, ]
+data1945_1 <- data1945_1[data1945_1$HARVEST_CROPLAND != 0, ]
+
+data1950_1 <- data1950_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1950_1 <- data1950_1[data1950_1$TOTPOP != 0, ]
+data1950_1 <- data1950_1[data1950_1$FARM_LAND_ACR != 0, ]
+data1950_1 <- data1950_1[data1950_1$HARVEST_CROPLAND != 0, ]
+
+data1954_1 <- data1954_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1954_1 <- data1954_1[data1954_1$TOTPOP != 0, ]
+data1954_1 <- data1954_1[data1954_1$FARM_LAND_ACR != 0, ]
+data1954_1 <- data1954_1[data1954_1$HARVEST_CROPLAND != 0, ]
+
+data1959_1 <- data1959_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1959_1 <- data1959_1[data1954_1$TOTPOP != 0, ]
+data1959_1 <- data1959_1[data1959_1$FARM_LAND_ACR != 0, ]
+data1959_1 <- data1959_1[data1959_1$HARVEST_CROPLAND != 0, ]
+
+data1964_1 <- data1964_1 %>% drop_na(TOTPOP, FARM_LAND_ACR, HARVEST_CROPLAND)
+data1964_1 <- data1964_1[data1954_1$TOTPOP != 0, ]
+data1964_1 <- data1964_1[data1964_1$FARM_LAND_ACR != 0, ]
+data1964_1 <- data1964_1[data1964_1$HARVEST_CROPLAND != 0, ]
+
+data1969_1 <- data1969_1 %>% drop_na(FARM_LAND_ACR, HARVEST_CROPLAND)
+data1969_1 <- data1969_1[data1969_1$FARM_LAND_ACR != 0, ]
+data1969_1 <- data1969_1[data1969_1$HARVEST_CROPLAND != 0, ]
+
+data1974_1 <- data1974_1 %>% drop_na(FARM_LAND_ACR, HARVEST_CROPLAND)
+data1974_1 <- data1974_1[data1974_1$FARM_LAND_ACR != 0, ]
+data1974_1 <- data1974_1[data1974_1$HARVEST_CROPLAND != 0, ]
+
+# Add the Column "TOTPOP" to 1969_1
+data1969_1[,"TOTPOP"] <- NA
+
+# Add the Column "TOTPOP" to 1974_1
+data1974_1[,"TOTPOP"] <- NA
+
+# Change the New "colnames" after merging
+data1954_1 <- rename(data1954_1, YEAR = YEAR.x)
+data1954_1 <- rename(data1954_1, STATE = STATEICP)
+data1954_1 <- rename(data1954_1, LEVEL = LEVEL.x)
+
+data1959_1 <- rename(data1959_1, YEAR = YEAR.x)
+data1959_1 <- rename(data1959_1, STATE = STATEICP)
+data1959_1 <- rename(data1959_1, LEVEL = LEVEL.x)
+
+# Check the Data to See if it Fits
+summary(data1945_1)
+summary(data1950_1)
+summary(data1954_1)
+summary(data1959_1)
+
+# Output
+Output <- rbind(data1925_1, data1930_1, data1940_1, data1945_1, data1950_1, data1954_1, data1959_1, data1964_1, data1969_1, data1974_1)
+
+# Save as .csv
+write.csv(x=Output, file="Output.csv", row.names=FALSE)
