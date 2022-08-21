@@ -23,7 +23,9 @@ The data used were obtained internally under confident measures, however, a modi
 
 ## Code Walkthrough (step by step - only some parts selected for length purposes)
 ### Install Packages
-`destroy()`
+Install the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr()`, `readxl()`, `ggplot2()`, `plm()`, `stringr()`, `MAP()`, `purrr()`.
+
+![](https://github.com/melbsyd/Data_Analytics/blob/main/1.png?raw=true)
 
 
 ## Final Data Summary Statistics
