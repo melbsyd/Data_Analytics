@@ -21,11 +21,15 @@ The data used were obtained internally under confident measures, however, a modi
 
 ## Variables included
 
-## Code Walkthrough (step by step)
+## Code Walkthrough (step by step - only some parts selected for length purposes)
+### Install Packages
+`destroy()`
+
 
 ## Final Data Summary Statistics
 1. we have xx,xxx observsations
 2. this is a list of variables and a description and summary for each
+
 
 
 # Part 2 - US Elections
