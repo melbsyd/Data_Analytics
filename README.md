@@ -25,8 +25,9 @@ The data used were obtained internally under confident measures, however, a modi
 ### Install Packages
 Install the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr()`, `readxl()`, `ggplot2()`, `plm()`, `stringr()`, `MAP()`, `purrr()`.
 
-![](https://github.com/melbsyd/Data_Analytics/blob/main/1.png?raw=true width=50% height=50%)
-
+<div style="width: 60%; height: 60%">
+![](https://github.com/melbsyd/Data_Analytics/blob/main/1.png?raw=true)
+<\div>
 
 ## Final Data Summary Statistics
 1. we have xx,xxx observsations
