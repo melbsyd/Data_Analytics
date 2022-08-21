@@ -22,11 +22,11 @@ The data used were obtained internally under confident measures, however, a modi
 ## Variables included
 
 ## Code Walkthrough (step by step - only some parts selected for length purposes)
-### Install Packages
-Install the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr()`, `readxl()`, `ggplot2()`, `plm()`, `stringr()`, `MAP()`, `purrr()`.
+### Install & Load Packages 
+Install and the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr()`, `readxl()`, `ggplot2()`, `plm()`, `stringr()`, `MAP()`, `purrr()`.
+`install.packages("data.table")`
 
-
-<img src="(https://your-image-url.type](https://github.com/melbsyd/Data_Analytics/blob/main/1.png?raw=true)" width="50">
+### 
 
 
 ## Final Data Summary Statistics
