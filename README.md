@@ -48,7 +48,7 @@ Load state to fips csv file. The exact location of the file must be adjusted: *r
 state_to_fips <- read_excel("StateFIPSicsprAB.xls")
 
 ### Check the Data Structure
-To get a better sense of what the loaded agriculture datafiles look like, we will choose and of the data files and call function `str()`, as `str(data1925_1`.
+To get a better sense of what the loaded agriculture datafiles look like, we will choose one of the data files and call function `str()`, as `str(data1925_1)`.
 
 ### Add column "Year"
 Add a new column year to the loaded agriculture data frames following this syntax: `data1925_1 <- cbind(YEAR = 1925, data1925_1)`. Later on, we will use this new column Year in our regression as a unit-fixed effect.
