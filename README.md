@@ -24,6 +24,7 @@ The data used were obtained internally under confident measures, however, a modi
 ## Code Walkthrough (step by step - only some parts selected for length purposes)
 ### Install & Load Packages 
 Install and the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr()`, `readxl()`, `ggplot2()`, `plm()`, `stringr()`, `MAP()`, `purrr()`.
+
 `install.packages("data.table")`
 
 ### 
