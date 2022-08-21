@@ -16,8 +16,10 @@ This project is divided into **two parts**. **Part 1** "Agriculture Performance"
 
 # Part 1 - Agriculture Performance
 ## Input Data (+ source)
-The "**United States Agriculture Data**" for the years **1840 - 2010** were published in Michigan by the ***Inter-university Consortium for Political and Social Research***.
+* The "**United States Agriculture Data**" for the years **1840 - 2010** were published in Michigan by the ***Inter-university Consortium for Political and Social Research***.
 The data used were obtained internally under confident measures, however, a modified version of this data colletion, which includes also the year 2012, is freely available on the webpage of the *Inter-university Consortium for Political and Social Research* under [this link](https://www.icpsr.umich.edu/web/ICPSR/studies/35206 "this link").
+
+* The **State to FIPS** csv file may be used later in this document for converting the FIPS codes into the county names under these codes.
 
 ## Variables included
 
@@ -30,13 +32,37 @@ Install and the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr
 * `library(data.table)`
 
 ### Load Agriculture Data (1925-1972)
-Load agriculture data from years 1925-1972.
+Load agriculture data from years 1925-1972. The exact location of the files must be adjusted: *read_dta("...)*
 * `data1925_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0012/35206-0012-Data.dta")`
+
 `.`
+
 `.`
+
 `.`
 
 For some years are two data files, as for example for the year 1954. This is because the year 1954 does not contain a column FIPS, which serves as an identification code. Later in the code, we will extract the missing columns and join both data frames so each year contains the FIPS column.
+
+### Load "State to FIPS" csv file
+Load state to fips csv file. The exact location of the file must be adjusted: *read_excel("...")*
+state_to_fips <- read_excel("StateFIPSicsprAB.xls")
+
+### Check the Data Structure
+To get a better sense of what the loaded agriculture datafiles look like, we will choose and of the data files and call function `str()`, as `str(data1925_1`.
+
+### Add column "Year"
+Add a new column year to the loaded agriculture data frames following this syntax: `data1925_1 <- cbind(YEAR = 1925, data1925_1)`. Later on, we will use this new column Year in our regression as a unit-fixed effect.
+
+### Extract the County Level Data
+Following `data1925_1 <- subset(data1925_1, LEVEL == 1)` leaves in the agriculture dataframes only county level data. State and USA level data are dropped out.
+
+
+
+
+
+
+
+
 
 
 ## Final Data Summary Statistics
