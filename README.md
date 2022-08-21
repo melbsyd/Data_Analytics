@@ -12,11 +12,31 @@
 [TOC]
 
 # Purpose
-This project is divided into two parts. The first part "Agriculture Performance" deals with data manipulation regarding US agriculture indicators and then predicting farm value based on a several variables that we choose. In the second part "Elections", we will try to answer the question: ,,How does Democrat's election results affect farm performance?".
-## Part 1
-## Part 2
+This project is divided into **two parts**. **Part 1** "Agriculture Performance" deals with data manipulation regarding US agriculture indicators and then predicting farm value based on a several variables that we choose. **Part 2** "US Elections", we will try to answer the question: ,,How does Democrat's election results affect farm performance?".
 
 # Part 1 - Agriculture Performance
+## Input Data (+ source)
+
+## Variables included
+
+## Code Walkthrough (step by step)
+
+## Final Data Summary Statistics
+1. we have xx,xxx observsations
+2. this is a list of variables and a description and summary for each
+
+
+# Part 2 - US Elections
+## Input Data (+ source)
+
+## Variables included
+
+## Code Walkthrough (step by step)
+
+## Final Data Summary Statistics
+1. we have xx,xxx observsations
+2. this is a list of variables and a description and summary for each
+
 
 
 ###H3 header
