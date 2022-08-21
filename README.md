@@ -16,6 +16,7 @@ This project is divided into **two parts**. **Part 1** "Agriculture Performance"
 
 # Part 1 - Agriculture Performance
 ## Input Data (+ source)
+The "**United States Agriculture Data**" for the years **1840 - 2010** were published in Michigan by the ***Inter-university Consortium for Political and Social Research***.
 
 ## Variables included
 
