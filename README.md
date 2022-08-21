@@ -17,7 +17,7 @@ This project is divided into **two parts**. **Part 1** "Agriculture Performance"
 # Part 1 - Agriculture Performance
 ## Input Data (+ source)
 The "**United States Agriculture Data**" for the years **1840 - 2010** were published in Michigan by the ***Inter-university Consortium for Political and Social Research***.
-The data used were obtained internally under confident measures, however, a modified version of this data colletion, which includes also the year 2012, is freely available on the webpage of the Inter-university Consortium for Political and Social Research under this link ![](https://www.icpsr.umich.edu/web/ICPSR/studies/35206)
+The data used were obtained internally under confident measures, however, a modified version of this data colletion, which includes also the year 2012, is freely available on the webpage of the Inter-university Consortium for Political and Social Research under [this link](https://www.icpsr.umich.edu/web/ICPSR/studies/35206 "this link").
 
 ## Variables included
 
