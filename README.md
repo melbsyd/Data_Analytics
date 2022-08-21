@@ -1,6 +1,3 @@
-# Data_Analytics
-
-
 # Readme.md
 
 ![](https://github.com/melbsyd/Data_Analytics/blob/main/Agricultural_Census.png?raw=true)
