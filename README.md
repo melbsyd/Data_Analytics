@@ -29,7 +29,14 @@ Install and the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr
 
 * `library(data.table)`
 
-### 
+### Load Agriculture Data (1925-1972)
+Load agriculture data from years 1925-1972.
+* `data1925_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0012/35206-0012-Data.dta")`
+`.`
+`.`
+`.`
+
+For some years are two data files, as for example for the year 1954. This is because the year 1954 does not contain a column FIPS, which serves as an identification code. Later in the code, we will extract the missing columns and join both data frames so each year contains the FIPS column.
 
 
 ## Final Data Summary Statistics
