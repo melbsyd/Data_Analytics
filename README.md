@@ -12,9 +12,15 @@
 [TOC]
 
 # Purpose
-This project is divided into **two parts**. **Part 1** "Agriculture Performance" deals with data manipulation regarding US agriculture indicators and then predicting farm value based on a several variables that we choose. **Part 2** "US Elections", we will try to answer the question: ,,How does Democrat's election results affect farm performance?".
+This project is divided into **two parts**. **Part 1** "Agriculture Performance" deals with data manipulation regarding US agriculture indicators and then predicting farm value based on several variables that we choose. **Part 2** "US Elections", we will try to answer the question: ,,How does Democrat's election results affect farm performance?".
 
 # Part 1 - Agriculture Performance
+## Purpose
+In Part 1, we will:
+
+**1.** Compile the panel data set for every county (FIPS) and year (1928-1972)
+
+**2.** Choose several variables which may be related to farm performance.
 ## Input Data (+ source)
 * The "**United States Agriculture Data**" for the years **1840 - 2010** were published in Michigan by the ***Inter-university Consortium for Political and Social Research***.
 The data used were obtained internally under confident measures, however, a modified version of this data colletion, which includes also the year 2012, is freely available on the webpage of the *Inter-university Consortium for Political and Social Research* under [this link](https://www.icpsr.umich.edu/web/ICPSR/studies/35206 "this link").
@@ -22,6 +28,14 @@ The data used were obtained internally under confident measures, however, a modi
 * The **State to FIPS** csv file may be used later in this document for converting the FIPS codes into the county names under these codes.
 
 ## Variables included
+1. FIPS &#8594; *(smallest geographic unit)*
+2. year &#8594; *(1928-1972)*
+3. state &#8594; *(US states)*
+4. pop &#8594; *(total population)*
+5. area &#8594; *(total area)*
+6. avgtotvalueperfarm &#8594; *(**"Average total value of a farm"** Constructed as follows: (value of the concrete farm + the value of its lifestock) / number of farms in that county)*
+7.  It is created by dividing the Total Value of a farm by the number of farms in a county. 
+The Total Value of a farm consists of the Value of the Farm + the Value of Lifestock, if that is separately listed.
 
 ## Code Walkthrough (step by step - only some parts selected for length purposes)
 ### Install & Load Packages 
@@ -56,6 +70,7 @@ Add a new column year to the loaded agriculture data frames following this synta
 ### Extract the County Level Data
 Following `data1925_1 <- subset(data1925_1, LEVEL == 1)` leaves in the agriculture dataframes only county level data. State and USA level data are dropped out.
 
+### Rename Columns
 
 
 
