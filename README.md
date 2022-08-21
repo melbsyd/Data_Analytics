@@ -27,6 +27,8 @@ Install and the following packages: `data.table()`, `haven()`, `dplyr()`, `tidyr
 
 `install.packages("data.table")`
 
+`library(data.table)`
+
 ### 
 
 
