@@ -1,0 +1,1224 @@
+# Part 1 ####
+
+# Compile the panel data set for every county (FIPS) and year
+# Only take the variables you need.
+# Main outcome variables should relate to "Farm Performance". Limit yourself to 1-4 variables!
+  
+# Create one Output file in "Data/Processing/ICPSR_35206/Final".
+
+
+# Part 2 ####
+
+
+
+
+
+rm(list=ls(all=T)) # Delete all present objects in the workspace
+setwd("/Users/tomasnovak/Desktop/Agriculture") # Set a working directory
+
+options(scipen=999) # Disables printing results in scientific notation
+
+# 0. Notes ####
+# TOTPOPulation is always only for years like 1920, ..30, ..40, ..50, ...
+
+
+# 1. Install the packages we want ####
+install.packages("data.table")
+install.packages("haven")
+install.packages("dplyr")
+install.packages("tidyr")
+install.packages("readxl")
+install.packages("ggplot2")
+install.packages("plm")
+install.packages("stringr")
+install.packages("MAP")
+install.packages("purrr")
+
+
+# 2. Read the packages we want ####
+library(data.table)
+library(haven)
+library(dplyr)
+library(tidyr)
+library(readxl)
+library(ggplot2)
+library(plm)
+library(stringr)
+library(MAP)
+library(purrr)
+
+# 3. Load data ####
+# 3.1 Load agriculture data for years from 1925 to 1974 ####
+data1925_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0012/35206-0012-Data.dta")
+data1930_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0013/35206-0013-Data.dta")
+data1940_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0016/35206-0016-Data.dta")
+data1945_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0020/35206-0020-Data.dta")
+data1950_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0021/35206-0021-Data.dta")
+data1954_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0025/35206-0025-Data.dta")
+data1954_2 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0026/35206-0026-Data.dta")
+data1959_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0027/35206-0027-Data.dta")
+data1959_2 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0028/35206-0028-Data.dta")
+data1964_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0030/35206-0030-Data.dta")
+data1969_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0033/35206-0033-Data.dta")
+data1974_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0036/35206-0036-Data.dta")
+
+# 3.2 Load this file to convert the state codes to their names and later to convert the information in the election data to FIPS ####
+state_to_fips <- read_excel("StateFIPSicsprAB.xls")
+
+
+# Part 1 ####
+
+
+
+# 4. Check the data structure ####
+str(data1925_1)
+str(data1930_1)
+str(data1940_1)
+str(data1945_1)
+str(data1950_1)
+str(data1954_1)
+str(data1954_2)
+str(data1959_1)
+str(data1959_2)
+str(data1964_1)
+str(data1969_1)
+str(data1974_1)
+
+
+# 5. Add column "YEAR" ####
+data1925_1 <- cbind(YEAR = 1925, data1925_1)
+data1930_1 <- cbind(YEAR = 1930, data1930_1)
+data1940_1 <- cbind(YEAR = 1940, data1940_1)
+data1945_1 <- cbind(YEAR = 1945, data1945_1)
+data1950_1 <- cbind(YEAR = 1950, data1950_1)
+data1954_1 <- cbind(YEAR = 1954, data1954_1)
+data1954_2 <- cbind(YEAR = 1954, data1954_2)
+data1959_1 <- cbind(YEAR = 1959, data1959_1)
+data1959_2 <- cbind(YEAR = 1959, data1959_2)
+data1964_1 <- cbind(YEAR = 1964, data1964_1)
+data1969_1 <- cbind(YEAR = 1969, data1969_1)
+data1974_1 <- cbind(YEAR = 1974, data1974_1)
+
+
+# 6. Extract the County Level Data ####
+data1925_1 <- subset(data1925_1, LEVEL == 1)
+data1930_1 <- subset(data1930_1, LEVEL == 1)
+data1940_1 <- subset(data1940_1, LEVEL == 1)
+data1945_1 <- subset(data1945_1, LEVEL == 1)
+data1950_1 <- subset(data1950_1, LEVEL == 1)
+data1954_1 <- subset(data1954_1, LEVEL == 1)
+data1954_2 <- subset(data1954_2, LEVEL == 1)
+data1959_1 <- subset(data1959_1, LEVEL == 1)
+data1959_2 <- subset(data1959_2, LEVEL == 1)
+data1964_1 <- subset(data1964_1, LEVEL == 1)
+data1969_1 <- subset(data1969_1, LEVEL == 1)
+data1974_1 <- subset(data1974_1, LEVEL == 1)
+
+
+# 7. Rename Columns ####
+data1925_1 <- rename(data1925_1, TOTPOP = VAR1)
+data1925_1 <- rename(data1925_1, FarmVal = VAR125)
+data1925_1 <- rename(data1925_1, FarmNumber = VAR2)
+data1925_1 <- rename(data1925_1, TOTAREA = VAR71)
+
+data1930_1 <- rename(data1930_1, TOTPOP = VAR1)
+data1930_1 <- rename(data1930_1, FarmVal = VAR120)
+data1930_1 <- rename(data1930_1, FarmNumber = VAR1109)
+data1930_1 <- rename(data1930_1, TOTAREA = VAR6)
+
+data1940_1 <- rename(data1940_1, TOTPOP = VAR1)
+data1940_1 <- rename(data1940_1, FarmVal = VAR29)
+data1940_1 <- rename(data1940_1, FarmNumber = VAR4)
+data1940_1 <- rename(data1940_1, TOTAREA = VAR5)
+
+data1945_1 <- rename(data1945_1, TOTPOP = TOTPOP40)
+data1945_1 <- rename(data1945_1, AvgFarmVal = VAR40)
+data1945_1 <- rename(data1945_1, TOTAREA = VAR3)
+
+data1950_1 <- rename(data1950_1, AvgFarmVal = VAR10)
+data1950_1 <- rename(data1950_1, TOTAREA = VAR2)
+
+data1954_1 <- rename(data1954_1, TOTPOP = TOTPOP50)
+data1954_1 <- rename(data1954_1, FARM_LAND_ACR = VAR8)
+data1954_1 <- rename(data1954_1, HARVEST_CROPLAND = VAR14)
+data1954_1 <- rename(data1954_1, AvgFarmVal = VAR10)
+data1954_1 <- rename(data1954_1, TOTAREA = VAR2)
+
+data1954_2 <- rename(data1954_2, FARM_LAND_ACR = ITEM004)
+data1954_2 <- rename(data1954_2, HARVEST_CROPLAND = ITEM006)
+
+
+data1959_1 <- rename(data1959_1, TOTPOP = TOTPOP60)
+data1959_1 <- rename(data1959_1, FARM_LAND_ACR = VAR5)
+data1959_1 <- rename(data1959_1, HARVEST_CROPLAND = VAR11)
+data1959_1 <- rename(data1959_1, AvgFarmVal = VAR7)
+data1959_1 <- rename(data1959_1, TOTAREA = VAR3)
+
+data1959_2 <- rename(data1959_2, FARM_LAND_ACR = ITEM004)
+data1959_2 <- rename(data1959_2, HARVEST_CROPLAND = ITEM006)
+
+data1964_1 <- rename(data1964_1, TOTPOP = TOTPOP60)
+data1964_1 <- rename(data1964_1, AvgFarmVal = VAR6)
+data1964_1 <- rename(data1964_1, TOTAREA = VAR2)
+
+data1969_1 <- rename(data1969_1, AvgFarmVal = ITEM01007)
+data1969_1 <- rename(data1969_1, TOTAREA = ITEM01004)
+
+data1974_1 <- rename(data1974_1, AvgFarmVal = ITEM01007)
+data1974_1 <- rename(data1974_1, TOTAREA = ITEM01004)
+
+# 8. Merge Data Files to Get Missing FIPS ####
+data1954_1 <- left_join(data1954_1, data1954_2, by=c("FARM_LAND_ACR", "HARVEST_CROPLAND"))
+data1959_1 <- left_join(data1959_1, data1959_2, by=c("FARM_LAND_ACR", "HARVEST_CROPLAND"))
+
+
+# 9. Remove data you don't need anymore ####
+rm(data1954_2)
+rm(data1959_2)
+
+
+# 10. Extract the Variables You Want ####
+data1925_1 <- data1925_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "FarmVal", "FarmNumber")] 
+data1930_1 <- data1930_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "FarmVal", "FarmNumber")] 
+data1940_1 <- data1940_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "FarmVal", "FarmNumber")] 
+data1945_1 <- data1945_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "AvgFarmVal")] 
+data1950_1 <- data1950_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "AvgFarmVal")] 
+data1954_1 <- data1954_1[, c("YEAR.x","FIPS", "STATEICP", "LEVEL.x", "TOTPOP", "TOTAREA", "AvgFarmVal")] 
+data1959_1 <- data1959_1[, c("YEAR.x","FIPS", "STATEICP", "LEVEL.x", "TOTPOP", "TOTAREA", "AvgFarmVal")] 
+data1964_1 <- data1964_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "AvgFarmVal")]
+data1969_1 <- data1969_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTAREA", "AvgFarmVal")] 
+data1974_1 <- data1974_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTAREA", "AvgFarmVal")] 
+
+
+# 11. Search for colnames (exist?) ####
+"FIPS" %in% names(data1964_1)
+
+
+# 12. Delete Rows with Missing the Values Were Interested in ####
+data1925_1 <- data1925_1 %>% drop_na(TOTPOP, TOTAREA, FarmVal, FarmNumber)
+data1925_1 <- data1925_1[data1925_1$TOTPOP != 0, ]
+data1925_1 <- data1925_1[data1925_1$FarmVal != 0, ]
+data1925_1 <- data1925_1[data1925_1$FarmNumber != 0, ]
+data1925_1 <- data1925_1[data1925_1$TOTAREA != 0, ]
+
+data1930_1 <- data1930_1 %>% drop_na(TOTPOP, TOTAREA, FarmVal, FarmNumber)
+data1930_1 <- data1930_1[data1930_1$TOTPOP != 0, ]
+data1930_1 <- data1930_1[data1930_1$FarmVal != 0, ]
+data1930_1 <- data1930_1[data1930_1$FarmNumber != 0, ]
+data1930_1 <- data1930_1[data1930_1$TOTAREA != 0, ]
+
+data1940_1 <- data1940_1 %>% drop_na(TOTPOP, TOTAREA, FarmVal, FarmNumber)
+data1940_1 <- data1940_1[data1940_1$TOTPOP != 0, ]
+data1940_1 <- data1940_1[data1940_1$FarmVal != 0, ]
+data1940_1 <- data1940_1[data1940_1$FarmNumber != 0, ]
+data1940_1 <- data1940_1[data1940_1$TOTAREA != 0, ]
+
+data1945_1 <- data1945_1 %>% drop_na(TOTPOP, TOTAREA, AvgFarmVal)
+data1945_1 <- data1945_1[data1945_1$TOTPOP != 0, ]
+data1945_1 <- data1945_1[data1945_1$AvgFarmVal != 0, ]
+data1945_1 <- data1945_1[data1945_1$TOTAREA != 0, ]
+
+data1950_1 <- data1950_1 %>% drop_na(TOTPOP, TOTAREA, AvgFarmVal)
+data1950_1 <- data1950_1[data1950_1$TOTPOP != 0, ]
+data1950_1 <- data1950_1[data1950_1$AvgFarmVal != 0, ]
+data1950_1 <- data1950_1[data1950_1$TOTAREA != 0, ]
+
+data1954_1 <- data1954_1 %>% drop_na(TOTPOP, TOTAREA, AvgFarmVal)
+data1954_1 <- data1954_1[data1954_1$TOTPOP != 0, ]
+data1954_1 <- data1954_1[data1954_1$AvgFarmVal != 0, ]
+data1954_1 <- data1954_1[data1954_1$TOTAREA != 0, ]
+
+data1959_1 <- data1959_1 %>% drop_na(TOTPOP, TOTAREA, AvgFarmVal)
+data1959_1 <- data1959_1[data1954_1$TOTPOP != 0, ]
+data1959_1 <- data1959_1[data1959_1$AvgFarmVal != 0, ]
+data1959_1 <- data1959_1[data1959_1$TOTAREA != 0, ]
+
+data1964_1 <- data1964_1 %>% drop_na(TOTPOP, TOTAREA, AvgFarmVal)
+data1964_1 <- data1964_1[data1954_1$TOTPOP != 0, ]
+data1964_1 <- data1964_1[data1964_1$AvgFarmVal != 0, ]
+data1964_1 <- data1964_1[data1964_1$TOTAREA != 0, ]
+
+data1969_1 <- data1969_1 %>% drop_na(TOTAREA, AvgFarmVal)
+data1969_1 <- data1969_1[data1969_1$AvgFarmVal != 0, ]
+data1969_1 <- data1969_1[data1969_1$TOTAREA != 0, ]
+
+data1974_1 <- data1974_1 %>% drop_na(TOTAREA, AvgFarmVal)
+data1974_1 <- data1974_1[data1974_1$AvgFarmVal != 0, ]
+data1974_1 <- data1974_1[data1974_1$TOTAREA != 0, ]
+
+# 13. Add the Column "TOTPOP" to 1969_1 ####
+data1969_1[,"TOTPOP"] <- NA
+
+
+# 14. Add the Column "TOTPOP" to 1974_1 ####
+data1974_1[,"TOTPOP"] <- NA
+
+# 14. Add the Column "AvgFarmVal" to 1925_1 ####
+data1925_1[,"AvgFarmVal"] <- NA
+
+# 14. Add the Column "AvgFarmVal" to 1930_1 ####
+data1930_1[,"AvgFarmVal"] <- NA
+
+# 14. Add the Column "AvgFarmVal" to 1940_1 ####
+data1940_1[,"AvgFarmVal"] <- NA
+
+# 16. Fill the two newly added columns by: (FarmVal / FarmNumber)
+data1925_1$AvgFarmVal <- data1925_1$FarmVal/data1925_1$FarmNumber
+data1930_1$AvgFarmVal <- data1930_1$FarmVal/data1930_1$FarmNumber
+data1940_1$AvgFarmVal <- data1940_1$FarmVal/data1940_1$FarmNumber
+
+# 17. Delete the reduntant column in 1930_1 and 1940_1
+data1925_1$FarmVal <- NULL
+data1925_1$FarmNumber <- NULL
+data1930_1$FarmVal <- NULL
+data1930_1$FarmNumber <- NULL
+data1940_1$FarmVal <- NULL
+data1940_1$FarmNumber <- NULL
+
+# 15. Change the New "colnames" after merging ####
+data1954_1 <- rename(data1954_1, YEAR = YEAR.x)
+data1954_1 <- rename(data1954_1, STATE = STATEICP)
+data1954_1 <- rename(data1954_1, LEVEL = LEVEL.x)
+
+data1959_1 <- rename(data1959_1, YEAR = YEAR.x)
+data1959_1 <- rename(data1959_1, STATE = STATEICP)
+data1959_1 <- rename(data1959_1, LEVEL = LEVEL.x)
+
+
+# 16. Check the Data to See if it Fits ####
+summary(data1925_1)
+summary(data1930_1)
+summary(data1940_1)
+summary(data1945_1)
+summary(data1950_1)
+summary(data1954_1)
+summary(data1959_1)
+summary(data1964_1)
+summary(data1969_1)
+summary(data1974_1)
+
+
+# 17. Merge the datasets into "File" ####
+Final <- rbind(data1925_1, data1930_1, data1940_1, data1945_1, data1950_1, data1954_1, data1959_1, data1964_1, data1969_1, data1974_1) # Row bind
+
+
+# 18. Delete observations with state code = 98 ("ICPSRStateCodeList" contains only 82 state codes) ####
+Final <- Final[Final$STATE != 98, ]
+
+
+# 19. "state_to_fips": Rename column "STICPSR" to STATE
+state_to_fips <- rename(state_to_fips, STATE = STICPSR)
+
+
+# 23. Remove  redundant columns in "state_to_fips"
+state_to_fips$FIPS <- NULL
+state_to_fips$NAME <- NULL
+state_to_fips$STNAME <- NULL
+
+
+# 20. Merge the "Final" dataset with the "state_to_fips" dataset to get the state names from its state codes
+Final <- left_join(Final, state_to_fips, by=c("STATE"))
+
+
+# 23. Remove  dataframe "state_to_fips"
+rm(state_to_fips)
+
+
+# 21. Get the state names 
+# Final$STATE <- ifelse(is.na(Final$AB), Final$STATE, Final$AB)
+
+
+# 23. Remove  redundant column in "Final"
+Final$AB <- NULL
+
+# 24. Remove an error value (avg )
+Final[27236, ] <- NA
+
+
+# 24. check structure ####
+str(Final)
+# look around in the viewer, check stuff like:
+unique(Final[, "STATE"]) # Prints unique state names in our dataframe
+summary(Final) # Summary table of our dataframe
+
+
+# 25. Plot "Final" variables distribution
+ggplot(data.frame(Final), aes(TOTPOP)) +               # Histogram with log10 axis
+  geom_histogram(bins = 100) +
+  scale_x_log10() 
+
+
+ggplot(data.frame(Final), aes(TOTAREA)) +               # Histogram with log10 axis
+  geom_histogram(bins = 100) +
+  scale_x_log10() 
+
+
+ggplot(data.frame(Final), aes(AvgFarmVal)) +               # Histogram with log10 axis
+  geom_histogram(bins = 100) +
+  scale_x_log10() 
+
+
+
+# 26. Save as .csv ####
+write.csv2(x=Final, file="Final.csv", row.names=FALSE)
+
+# 27. Delete dataframes we don't need ####
+rm(data1925_1)
+rm(data1930_1)
+rm(data1940_1)
+rm(data1945_1)
+rm(data1950_1)
+rm(data1954_1)
+rm(data1959_1)
+rm(data1964_1)
+rm(data1969_1)
+rm(data1974_1)
+
+
+
+# Part 2 ####
+
+
+
+# Main Question: How does Democrat's election results affect farm performance?
+
+
+# 27. Load the election data ####
+election_data <- read_dta("ElectionData/ICPSR_08611/08611-0001-Data.dta")
+
+
+# 28. Check structure of the election data ####
+str(election_data)
+
+
+# 29. Load the "state_to_fips" data
+state_to_fips <- read_excel("StateFIPSicsprAB.xls")
+
+
+# 30. Check structure of the "state_to_fips"  ####
+str(state_to_fips)
+
+# 31. Load the "transfer" data
+transfer <- read_dta("transfer/transfer.dta")
+
+
+# 32. Check structure of the "state_to_fips"  ####
+str(transfer)
+
+
+# 31. 
+num_cols <- unlist(lapply(election_data, is.numeric))
+
+
+election_data_non_numeric <- election_data[ , !num_cols]
+election_data_numeric <- election_data[ , num_cols]
+
+
+election_data_numeric[trunc(election_data_numeric) == 999] <- NA_real_
+election_data_numeric[trunc(election_data_numeric) == 9999] <- NA_real_
+election_data_numeric[trunc(election_data_numeric) == 99999] <- NA_real_
+election_data_numeric[trunc(election_data_numeric) == 999999] <- NA_real_
+election_data_numeric[trunc(election_data_numeric) == 9999999] <- NA_real_
+
+
+election_data <- cbind(election_data_non_numeric, election_data_numeric)
+
+
+# Extract Stata labels
+labels <- election_data %>% map_chr(~attributes(.)$label) %>% data.frame()
+
+x <- labels$.
+year <- as.numeric(gsub(".*?([0-9]+).*", "\\1", x))
+year <- if_else(year%in%c(1600:2020), year, NA_real_)
+
+dem_cong <- grepl(c("CONG DEM|CONG T/O"), labels$. )
+dem_pres <- grepl("PRES DEM|PRES T/O", labels$. )
+election_data_dem_cong <- election_data[ , dem_cong]
+election_data_dem_pres <- election_data[ , dem_pres]
+
+rep_cong <- grepl("CONG REP|CONG T/O", labels$. )
+rep_pres <- grepl("PRES REP|PRES T/O", labels$. )
+election_data_rep_cong <- election_data[ , rep_cong]
+election_data_rep_pres <- election_data[ , rep_pres]
+
+
+# Subset only the column we want from the "election_data_2"
+election_data <- election_data[c("V2", "V1", "V3")]
+
+
+# Add a column "observation" with the number of observations to "election_data"
+election_data$observation <- 1:nrow(election_data)
+
+
+# Add a column "observation" with the number of observations to "election_data_dem_cong"
+election_data_dem_cong$observation <- 1:nrow(election_data_dem_cong)
+
+
+# Add a column "observation" with the number of observations to "election_data_dem_pres"
+election_data_dem_pres$observation <- 1:nrow(election_data_dem_pres)
+
+
+# Add a column "observation" with the number of observations to "election_data_rep_cong"
+election_data_rep_cong$observation <- 1:nrow(election_data_rep_cong)
+
+
+# Add a column "observation" with the number of observations to "election_data_rep_pres"
+election_data_rep_pres$observation <- 1:nrow(election_data_rep_pres)
+
+
+# Choose the data we want to pick (democrats)
+
+
+dem28pres <- election_data_dem_pres[c("V477", "V482", "observation")]
+dem28pres$Year <- 1928
+dem28pres$Type <- 1
+dem28pres <- left_join(election_data, dem28pres, by=c("observation"))
+dem28pres$observation <- NULL
+dem28pres <- rename(dem28pres, dem = V477)
+dem28pres <- rename(dem28pres, Tot = V482)
+dem28pres <- data.table(dem28pres)
+
+
+dem30cong <- election_data_dem_cong[c("V490", "V497", "observation")]
+dem30cong$Year <- 1930
+dem30cong$Type <- 2
+dem30cong <- left_join(election_data, dem30cong, by=c("observation"))
+dem30cong$observation <- NULL
+dem30cong <- rename(dem30cong, dem = V490)
+dem30cong <- rename(dem30cong, Tot = V497)
+dem30cong <- data.table(dem30cong)
+
+
+dem32pres <- election_data_dem_pres[c("V498", "V503", "observation")]
+dem32pres$Year <- 1932
+dem32pres$Type <- 1
+dem32pres <- left_join(election_data, dem32pres, by=c("observation"))
+dem32pres$observation <- NULL
+dem32pres <- rename(dem32pres, dem = V498)
+dem32pres <- rename(dem32pres, Tot = V503)
+dem32pres <- data.table(dem32pres)
+
+
+dem40pres <- election_data_dem_pres[c("V546", "V551", "observation")]
+dem40pres$Year <- 1940
+dem40pres$Type <- 1
+dem40pres <- left_join(election_data, dem40pres, by=c("observation"))
+dem40pres$observation <- NULL
+dem40pres <- rename(dem40pres, dem = V546)
+dem40pres <- rename(dem40pres, Tot = V551)
+dem40pres <- data.table(dem40pres)
+
+
+dem40cong <- election_data_dem_cong[c("V552", "V558", "observation")]
+dem40cong$Year <- 1940
+dem40cong$Type <- 2
+dem40cong <- left_join(election_data, dem40cong, by=c("observation"))
+dem40cong$observation <- NULL
+dem40cong <- rename(dem40cong, dem = V552)
+dem40cong <- rename(dem40cong, Tot = V558)
+dem40cong <- data.table(dem40cong)
+
+
+dem42cong <- election_data_dem_cong[c("V559", "V566", "observation")]
+dem42cong$Year <- 1942
+dem42cong$Type <- 2
+dem42cong <- left_join(election_data, dem42cong, by=c("observation"))
+dem42cong$observation <- NULL
+dem42cong <- rename(dem42cong, dem = V559)
+dem42cong <- rename(dem42cong, Tot = V566)
+dem42cong <- data.table(dem42cong)
+
+
+dem44pres <- election_data_dem_pres[c("V567", "V572", "observation")]
+dem44pres$Year <- 1944
+dem44pres$Type <- 1
+dem44pres <- left_join(election_data, dem44pres, by=c("observation"))
+dem44pres$observation <- NULL
+dem44pres <- rename(dem44pres, dem = V567)
+dem44pres <- rename(dem44pres, Tot = V572)
+dem44pres <- data.table(dem44pres)
+
+
+dem44cong <- election_data_dem_cong[c("V573", "V579", "observation")]
+dem44cong$Year <- 1944
+dem44cong$Type <- 2
+dem44cong <- left_join(election_data, dem44cong, by=c("observation"))
+dem44cong$observation <- NULL
+dem44cong <- rename(dem44cong, dem = V573)
+dem44cong <- rename(dem44cong, Tot = V579)
+dem44cong <- data.table(dem44cong)
+
+
+dem46cong <- election_data_dem_cong[c("V580", "V585", "observation")]
+dem46cong$Year <- 1946
+dem46cong$Type <- 2
+dem46cong <- left_join(election_data, dem46cong, by=c("observation"))
+dem46cong$observation <- NULL
+dem46cong <- rename(dem46cong, dem = V580)
+dem46cong <- rename(dem46cong, Tot = V585)
+dem46cong <- data.table(dem46cong)
+
+
+dem48pres <- election_data_dem_pres[c("V586", "V592", "observation")]
+dem48pres$Year <- 1948
+dem48pres$Type <- 1
+dem48pres <- left_join(election_data, dem48pres, by=c("observation"))
+dem48pres$observation <- NULL
+dem48pres <- rename(dem48pres, dem = V586)
+dem48pres <- rename(dem48pres, Tot = V592)
+dem48pres <- data.table(dem48pres)
+
+
+dem48cong <- election_data_dem_cong[c("V593", "V598", "observation")]
+dem48cong$Year <- 1948
+dem48cong$Type <- 2
+dem48cong <- left_join(election_data, dem48cong, by=c("observation"))
+dem48cong$observation <- NULL
+dem48cong <- rename(dem48cong, dem = V593)
+dem48cong <- rename(dem48cong, Tot = V598)
+dem48cong <- data.table(dem48cong)
+
+
+dem50cong <- election_data_dem_cong[c("V599", "V603", "observation")]
+dem50cong$Year <- 1950
+dem50cong$Type <- 2
+dem50cong <- left_join(election_data, dem50cong, by=c("observation"))
+dem50cong$observation <- NULL
+dem50cong <- rename(dem50cong, dem = V599)
+dem50cong <- rename(dem50cong, Tot = V603)
+dem50cong <- data.table(dem50cong)
+
+
+dem52pres <- election_data_dem_pres[c("V604", "V608", "observation")]
+dem52pres$Year <- 1952
+dem52pres$Type <- 1
+dem52pres <- left_join(election_data, dem52pres, by=c("observation"))
+dem52pres$observation <- NULL
+dem52pres <- rename(dem52pres, dem = V604)
+dem52pres <- rename(dem52pres, Tot = V608)
+dem52pres <- data.table(dem52pres)
+
+
+dem52cong <- election_data_dem_cong[c("V609", "V613", "observation")]
+dem52cong$Year <- 1952
+dem52cong$Type <- 2
+dem52cong <- left_join(election_data, dem52cong, by=c("observation"))
+dem52cong$observation <- NULL
+dem52cong <- rename(dem52cong, dem = V609)
+dem52cong <- rename(dem52cong, Tot = V613)
+dem52cong <- data.table(dem52cong)
+
+
+dem54cong <- election_data_dem_cong[c("V614", "V618", "observation")]
+dem54cong$Year <- 1954
+dem54cong$Type <- 2
+dem54cong <- left_join(election_data, dem54cong, by=c("observation"))
+dem54cong$observation <- NULL
+dem54cong <- rename(dem54cong, dem = V614)
+dem54cong <- rename(dem54cong, Tot = V618)
+dem54cong <- data.table(dem54cong)
+
+
+dem56pres <- election_data_dem_pres[c("V619", "V623", "observation")]
+dem56pres$Year <- 1956
+dem56pres$Type <- 1
+dem56pres <- left_join(election_data, dem56pres, by=c("observation"))
+dem56pres$observation <- NULL
+dem56pres <- rename(dem56pres, dem = V619)
+dem56pres <- rename(dem56pres, Tot = V623)
+dem56pres <- data.table(dem56pres)
+
+
+dem56cong <- election_data_dem_cong[c("V624", "V628", "observation")]
+dem56cong$Year <- 1956
+dem56cong$Type <- 2
+dem56cong <- left_join(election_data, dem56cong, by=c("observation"))
+dem56cong$observation <- NULL
+dem56cong <- rename(dem56cong, dem = V624)
+dem56cong <- rename(dem56cong, Tot = V628)
+dem56cong <- data.table(dem56cong)
+
+
+dem58cong <- election_data_dem_cong[c("V629", "V633", "observation")]
+dem58cong$Year <- 1958
+dem58cong$Type <- 2
+dem58cong <- left_join(election_data, dem58cong, by=c("observation"))
+dem58cong$observation <- NULL
+dem58cong <- rename(dem58cong, dem = V629)
+dem58cong <- rename(dem58cong, Tot = V633)
+dem58cong <- data.table(dem58cong)
+
+
+dem60pres <- election_data_dem_pres[c("V634", "V638", "observation")]
+dem60pres$Year <- 1960
+dem60pres$Type <- 1
+dem60pres <- left_join(election_data, dem60pres, by=c("observation"))
+dem60pres$observation <- NULL
+dem60pres <- rename(dem60pres, dem = V634)
+dem60pres <- rename(dem60pres, Tot = V638)
+dem60pres <- data.table(dem60pres)
+
+
+dem60cong <- election_data_dem_cong[c("V639", "V643", "observation")]
+dem60cong$Year <- 1960
+dem60cong$Type <- 2
+dem60cong <- left_join(election_data, dem60cong, by=c("observation"))
+dem60cong$observation <- NULL
+dem60cong <- rename(dem60cong, dem = V639)
+dem60cong <- rename(dem60cong, Tot = V643)
+dem60cong <- data.table(dem60cong)
+
+
+dem62cong <- election_data_dem_cong[c("V644", "V648", "observation")]
+dem62cong$Year <- 1962
+dem62cong$Type <- 2
+dem62cong <- left_join(election_data, dem62cong, by=c("observation"))
+dem62cong$observation <- NULL
+dem62cong <- rename(dem62cong, dem = V644)
+dem62cong <- rename(dem62cong, Tot = V648)
+dem62cong <- data.table(dem62cong)
+
+
+dem64pres <- election_data_dem_pres[c("V649", "V653", "observation")]
+dem64pres$Year <- 1964
+dem64pres$Type <- 1
+dem64pres <- left_join(election_data, dem64pres, by=c("observation"))
+dem64pres$observation <- NULL
+dem64pres <- rename(dem64pres, dem = V649)
+dem64pres <- rename(dem64pres, Tot = V653)
+dem64pres <- data.table(dem64pres)
+
+
+dem64cong <- election_data_dem_cong[c("V654", "V658", "observation")]
+dem64cong$Year <- 1964
+dem64cong$Type <- 2
+dem64cong <- left_join(election_data, dem64cong, by=c("observation"))
+dem64cong$observation <- NULL
+dem64cong <- rename(dem64cong, dem = V654)
+dem64cong <- rename(dem64cong, Tot = V658)
+dem64cong <- data.table(dem64cong)
+
+
+dem66cong <- election_data_dem_cong[c("V659", "V663", "observation")]
+dem66cong$Year <- 1966
+dem66cong$Type <- 2
+dem66cong <- left_join(election_data, dem66cong, by=c("observation"))
+dem66cong$observation <- NULL
+dem66cong <- rename(dem66cong, dem = V659)
+dem66cong <- rename(dem66cong, Tot = V663)
+dem66cong <- data.table(dem66cong)
+
+
+dem68pres <- election_data_dem_pres[c("V664", "V669", "observation")]
+dem68pres$Year <- 1968
+dem68pres$Type <- 1
+dem68pres <- left_join(election_data, dem68pres, by=c("observation"))
+dem68pres$observation <- NULL
+dem68pres <- rename(dem68pres, dem = V664)
+dem68pres <- rename(dem68pres, Tot = V669)
+dem68pres <- data.table(dem68pres)
+
+
+dem68cong <- election_data_dem_cong[c("V670", "V674", "observation")]
+dem68cong$Year <- 1968
+dem68cong$Type <- 2
+dem68cong <- left_join(election_data, dem68cong, by=c("observation"))
+dem68cong$observation <- NULL
+dem68cong <- rename(dem68cong, dem = V670)
+dem68cong <- rename(dem68cong, Tot = V674)
+dem68cong <- data.table(dem68cong)
+
+
+dem70cong <- election_data_dem_cong[c("V675", "V679", "observation")]
+dem70cong$Year <- 1970
+dem70cong$Type <- 2
+dem70cong <- left_join(election_data, dem70cong, by=c("observation"))
+dem70cong$observation <- NULL
+dem70cong <- rename(dem70cong, dem = V675)
+dem70cong <- rename(dem70cong, Tot = V679)
+dem70cong <- data.table(dem70cong)
+
+
+dem72pres <- election_data_dem_pres[c("V680", "V684", "observation")]
+dem72pres$Year <- 1972
+dem72pres$Type <- 1
+dem72pres <- left_join(election_data, dem72pres, by=c("observation"))
+dem72pres$observation <- NULL
+dem72pres <- rename(dem72pres, dem = V680)
+dem72pres <- rename(dem72pres, Tot = V684)
+dem72pres <- data.table(dem72pres)
+
+
+dem72cong <- election_data_dem_cong[c("V685", "V689", "observation")]
+dem72cong$Year <- 1972
+dem72cong$Type <- 2
+dem72cong <- left_join(election_data, dem72cong, by=c("observation"))
+dem72cong$observation <- NULL
+dem72cong <- rename(dem72cong, dem = V685)
+dem72cong <- rename(dem72cong, Tot = V689)
+dem72cong <- data.table(dem72cong)
+
+
+# Choose the data we want to pick (republicans)
+
+
+rep28pres <- election_data_rep_pres[c("V478", "V482", "observation")]
+rep28pres$Year <- 1928
+rep28pres$Type <- 1
+rep28pres <- left_join(election_data, rep28pres, by=c("observation"))
+rep28pres$observation <- NULL
+rep28pres <- rename(rep28pres, rep = V478)
+rep28pres <- rename(rep28pres, Tot = V482)
+rep28pres <- data.table(rep28pres)
+
+
+rep30cong <- election_data_rep_cong[c("V491", "V497", "observation")]
+rep30cong$Year <- 1930
+rep30cong$Type <- 2
+rep30cong <- left_join(election_data, rep30cong, by=c("observation"))
+rep30cong$observation <- NULL
+rep30cong <- rename(rep30cong, rep = V491)
+rep30cong <- rename(rep30cong, Tot = V497)
+rep30cong <- data.table(rep30cong)
+
+
+rep32pres <- election_data_rep_pres[c("V499", "V503", "observation")]
+rep32pres$Year <- 1932
+rep32pres$Type <- 1
+rep32pres <- left_join(election_data, rep32pres, by=c("observation"))
+rep32pres$observation <- NULL
+rep32pres <- rename(rep32pres, rep = V499)
+rep32pres <- rename(rep32pres, Tot = V503)
+rep32pres <- data.table(rep32pres)
+
+
+rep40pres <- election_data_rep_pres[c("V547", "V551", "observation")]
+rep40pres$Year <- 1940
+rep40pres$Type <- 1
+rep40pres <- left_join(election_data, rep40pres, by=c("observation"))
+rep40pres$observation <- NULL
+rep40pres <- rename(rep40pres, rep = V547)
+rep40pres <- rename(rep40pres, Tot = V551)
+rep40pres <- data.table(rep40pres)
+
+
+rep40cong <- election_data_rep_cong[c("V553", "V558", "observation")]
+rep40cong$Year <- 1940
+rep40cong$Type <- 2
+rep40cong <- left_join(election_data, rep40cong, by=c("observation"))
+rep40cong$observation <- NULL
+rep40cong <- rename(rep40cong, rep = V553)
+rep40cong <- rename(rep40cong, Tot = V558)
+rep40cong <- data.table(rep40cong)
+
+
+rep42cong <- election_data_rep_cong[c("V560", "V566", "observation")]
+rep42cong$Year <- 1942
+rep42cong$Type <- 2
+rep42cong <- left_join(election_data, rep42cong, by=c("observation"))
+rep42cong$observation <- NULL
+rep42cong <- rename(rep42cong, rep = V560)
+rep42cong <- rename(rep42cong, Tot = V566)
+rep42cong <- data.table(rep42cong)
+
+
+rep44pres <- election_data_rep_pres[c("V568", "V572", "observation")]
+rep44pres$Year <- 1944
+rep44pres$Type <- 1
+rep44pres <- left_join(election_data, rep44pres, by=c("observation"))
+rep44pres$observation <- NULL
+rep44pres <- rename(rep44pres, rep = V568)
+rep44pres <- rename(rep44pres, Tot = V572)
+rep44pres <- data.table(rep44pres)
+
+
+rep44cong <- election_data_rep_cong[c("V574", "V579", "observation")]
+rep44cong$Year <- 1944
+rep44cong$Type <- 2
+rep44cong <- left_join(election_data, rep44cong, by=c("observation"))
+rep44cong$observation <- NULL
+rep44cong <- rename(rep44cong, rep = V574)
+rep44cong <- rename(rep44cong, Tot = V579)
+rep44cong <- data.table(rep44cong)
+
+
+rep46cong <- election_data_rep_cong[c("V581", "V585", "observation")]
+rep46cong$Year <- 1946
+rep46cong$Type <- 2
+rep46cong <- left_join(election_data, rep46cong, by=c("observation"))
+rep46cong$observation <- NULL
+rep46cong <- rename(rep46cong, rep = V581)
+rep46cong <- rename(rep46cong, Tot = V585)
+rep46cong <- data.table(rep46cong)
+
+
+rep48pres <- election_data_rep_pres[c("V587", "V592", "observation")]
+rep48pres$Year <- 1948
+rep48pres$Type <- 1
+rep48pres <- left_join(election_data, rep48pres, by=c("observation"))
+rep48pres$observation <- NULL
+rep48pres <- rename(rep48pres, rep = V587)
+rep48pres <- rename(rep48pres, Tot = V592)
+rep48pres <- data.table(rep48pres)
+
+
+rep48cong <- election_data_rep_cong[c("V594", "V598", "observation")]
+rep48cong$Year <- 1948
+rep48cong$Type <- 2
+rep48cong <- left_join(election_data, rep48cong, by=c("observation"))
+rep48cong$observation <- NULL
+rep48cong <- rename(rep48cong, rep = V594)
+rep48cong <- rename(rep48cong, Tot = V598)
+rep48cong <- data.table(rep48cong)
+
+
+rep50cong <- election_data_rep_cong[c("V600", "V603", "observation")]
+rep50cong$Year <- 1950
+rep50cong$Type <- 2
+rep50cong <- left_join(election_data, rep50cong, by=c("observation"))
+rep50cong$observation <- NULL
+rep50cong <- rename(rep50cong, rep = V600)
+rep50cong <- rename(rep50cong, Tot = V603)
+rep50cong <- data.table(rep50cong)
+
+
+rep52pres <- election_data_rep_pres[c("V605", "V608", "observation")]
+rep52pres$Year <- 1952
+rep52pres$Type <- 1
+rep52pres <- left_join(election_data, rep52pres, by=c("observation"))
+rep52pres$observation <- NULL
+rep52pres <- rename(rep52pres, rep = V605)
+rep52pres <- rename(rep52pres, Tot = V608)
+rep52pres <- data.table(rep52pres)
+
+
+rep52cong <- election_data_rep_cong[c("V610", "V613", "observation")]
+rep52cong$Year <- 1952
+rep52cong$Type <- 2
+rep52cong <- left_join(election_data, rep52cong, by=c("observation"))
+rep52cong$observation <- NULL
+rep52cong <- rename(rep52cong, rep = V610)
+rep52cong <- rename(rep52cong, Tot = V613)
+rep52cong <- data.table(rep52cong)
+
+
+rep54cong <- election_data_rep_cong[c("V615", "V618", "observation")]
+rep54cong$Year <- 1954
+rep54cong$Type <- 2
+rep54cong <- left_join(election_data, rep54cong, by=c("observation"))
+rep54cong$observation <- NULL
+rep54cong <- rename(rep54cong, rep = V615)
+rep54cong <- rename(rep54cong, Tot = V618)
+rep54cong <- data.table(rep54cong)
+
+
+rep56pres <- election_data_rep_pres[c("V620", "V623", "observation")]
+rep56pres$Year <- 1956
+rep56pres$Type <- 1
+rep56pres <- left_join(election_data, rep56pres, by=c("observation"))
+rep56pres$observation <- NULL
+rep56pres <- rename(rep56pres, rep = V620)
+rep56pres <- rename(rep56pres, Tot = V623)
+rep56pres <- data.table(rep56pres)
+
+
+rep56cong <- election_data_rep_cong[c("V625", "V628", "observation")]
+rep56cong$Year <- 1956
+rep56cong$Type <- 2
+rep56cong <- left_join(election_data, rep56cong, by=c("observation"))
+rep56cong$observation <- NULL
+rep56cong <- rename(rep56cong, rep = V625)
+rep56cong <- rename(rep56cong, Tot = V628)
+rep56cong <- data.table(rep56cong)
+
+
+rep58cong <- election_data_rep_cong[c("V630", "V633", "observation")]
+rep58cong$Year <- 1958
+rep58cong$Type <- 2
+rep58cong <- left_join(election_data, rep58cong, by=c("observation"))
+rep58cong$observation <- NULL
+rep58cong <- rename(rep58cong, rep = V630)
+rep58cong <- rename(rep58cong, Tot = V633)
+rep58cong <- data.table(rep58cong)
+
+
+rep60pres <- election_data_rep_pres[c("V635", "V638", "observation")]
+rep60pres$Year <- 1960
+rep60pres$Type <- 1
+rep60pres <- left_join(election_data, rep60pres, by=c("observation"))
+rep60pres$observation <- NULL
+rep60pres <- rename(rep60pres, rep = V635)
+rep60pres <- rename(rep60pres, Tot = V638)
+rep60pres <- data.table(rep60pres)
+
+
+rep60cong <- election_data_rep_cong[c("V640", "V643", "observation")]
+rep60cong$Year <- 1960
+rep60cong$Type <- 2
+rep60cong <- left_join(election_data, rep60cong, by=c("observation"))
+rep60cong$observation <- NULL
+rep60cong <- rename(rep60cong, rep = V640)
+rep60cong <- rename(rep60cong, Tot = V643)
+rep60cong <- data.table(rep60cong)
+
+
+rep62cong <- election_data_rep_cong[c("V645", "V648", "observation")]
+rep62cong$Year <- 1962
+rep62cong$Type <- 2
+rep62cong <- left_join(election_data, rep62cong, by=c("observation"))
+rep62cong$observation <- NULL
+rep62cong <- rename(rep62cong, rep = V645)
+rep62cong <- rename(rep62cong, Tot = V648)
+rep62cong <- data.table(rep62cong)
+
+
+rep64pres <- election_data_rep_pres[c("V650", "V653", "observation")]
+rep64pres$Year <- 1964
+rep64pres$Type <- 1
+rep64pres <- left_join(election_data, rep64pres, by=c("observation"))
+rep64pres$observation <- NULL
+rep64pres <- rename(rep64pres, rep = V650)
+rep64pres <- rename(rep64pres, Tot = V653)
+rep64pres <- data.table(rep64pres)
+
+
+rep64cong <- election_data_rep_cong[c("V655", "V658", "observation")]
+rep64cong$Year <- 1964
+rep64cong$Type <- 2
+rep64cong <- left_join(election_data, rep64cong, by=c("observation"))
+rep64cong$observation <- NULL
+rep64cong <- rename(rep64cong, rep = V655)
+rep64cong <- rename(rep64cong, Tot = V658)
+rep64cong <- data.table(rep64cong)
+
+
+rep66cong <- election_data_rep_cong[c("V660", "V663", "observation")]
+rep66cong$Year <- 1966
+rep66cong$Type <- 2
+rep66cong <- left_join(election_data, rep66cong, by=c("observation"))
+rep66cong$observation <- NULL
+rep66cong <- rename(rep66cong, rep = V660)
+rep66cong <- rename(rep66cong, Tot = V663)
+rep66cong <- data.table(rep66cong)
+
+
+rep68pres <- election_data_rep_pres[c("V665", "V669", "observation")]
+rep68pres$Year <- 1968
+rep68pres$Type <- 1
+rep68pres <- left_join(election_data, rep68pres, by=c("observation"))
+rep68pres$observation <- NULL
+rep68pres <- rename(rep68pres, rep = V665)
+rep68pres <- rename(rep68pres, Tot = V669)
+rep68pres <- data.table(rep68pres)
+
+
+rep68cong <- election_data_rep_cong[c("V671", "V674", "observation")]
+rep68cong$Year <- 1968
+rep68cong$Type <- 2
+rep68cong <- left_join(election_data, rep68cong, by=c("observation"))
+rep68cong$observation <- NULL
+rep68cong <- rename(rep68cong, rep = V671)
+rep68cong <- rename(rep68cong, Tot = V674)
+rep68cong <- data.table(rep68cong)
+
+
+rep70cong <- election_data_rep_cong[c("V676", "V679", "observation")]
+rep70cong$Year <- 1970
+rep70cong$Type <- 2
+rep70cong <- left_join(election_data, rep70cong, by=c("observation"))
+rep70cong$observation <- NULL
+rep70cong <- rename(rep70cong, rep = V676)
+rep70cong <- rename(rep70cong, Tot = V679)
+rep70cong <- data.table(rep70cong)
+
+
+rep72pres <- election_data_rep_pres[c("V681", "V684", "observation")]
+rep72pres$Year <- 1972
+rep72pres$Type <- 1
+rep72pres <- left_join(election_data, rep72pres, by=c("observation"))
+rep72pres$observation <- NULL
+rep72pres <- rename(rep72pres, rep = V681)
+rep72pres <- rename(rep72pres, Tot = V684)
+rep72pres <- data.table(rep72pres)
+
+
+rep72cong <- election_data_rep_cong[c("V686", "V689", "observation")]
+rep72cong$Year <- 1972
+rep72cong$Type <- 2
+rep72cong <- left_join(election_data, rep72cong, by=c("observation"))
+rep72cong$observation <- NULL
+rep72cong <- rename(rep72cong, rep = V686)
+rep72cong <- rename(rep72cong, Tot = V689)
+rep72cong <- data.table(rep72cong)
+
+
+# Combine (by row) ####
+data3072_1 <- rbind(dem28pres, dem30cong, dem32pres, dem40cong, dem40pres, dem42cong, dem44cong, dem44pres, dem46cong, dem48cong,dem48pres, dem50cong, dem52pres, dem54cong, dem56cong, dem56pres, dem58cong, dem60cong, dem60pres, dem62cong, dem64cong, dem64pres, dem66cong, dem68cong, dem68pres, dem70cong,dem72cong, dem72pres,use.names = TRUE, fill=TRUE)
+
+
+data3072_2 <- rbind(rep28pres, rep30cong, rep32pres, rep40cong, rep40pres, rep42cong, rep44cong, rep44pres, rep46cong, rep48cong,rep48pres, rep50cong, rep52pres, rep54cong, rep56cong, rep56pres, rep58cong, rep60cong, rep60pres, rep62cong, rep64cong, rep64pres, rep66cong, rep68cong, rep68pres, rep70cong,rep72cong, rep72pres,use.names = TRUE)
+
+data3072_2$Tot <- NULL
+
+
+data3072 <- merge(data3072_1, data3072_2,by = c("V2","V1","V3","Year","Type"),all.x = TRUE)
+
+
+
+#combine data in each year and rename
+names(data3072) <- c("CountyName", "ICPSRstate", "ICPSRcounty", "Year", "Type", "Dem","Tot","Rep")
+
+
+transfer$NAME <- NULL
+
+names(transfer) <- c("ICPSRstate", "CountyName", "ICPSRcounty", "FIPSstate","FIPScounty")
+
+
+#merge with transfer document
+#data3072$CountyName <- as.numeric(unlist(data3072[,"CountyName"]))
+#data3072$ICPSRstate <- as.numeric(unlist(data3072[,"ICPSRstate"]))
+#data3072$ICPSRcounty <- as.numeric(unlist(data3072[,"ICPSRcounty"]))
+data3072 <- merge(data3072,transfer,by = c("CountyName","ICPSRstate","ICPSRcounty"),all.x = TRUE)
+#data3072 <- data3072[,c("FIPS","NAME","YEAR","LEVEL","DEM","REP","TO","FIPSstate","FIPScounty")]
+
+data3072 <- data3072[!is.na(data3072$FIPSstate),]
+
+
+state_to_fips <- state_to_fips[ , c(3,5)]
+names(state_to_fips) <- c("ICPSRstate", "State")
+data3072 <- merge(data3072,state_to_fips,by = c("ICPSRstate"),all.x = TRUE)
+
+#data3072 <- data3072[ , c(11,2,6,8,7,4,5)]
+
+
+data3072 <- data3072[ , c(10,11,2,6,8,7,4,5,1,3)]
+
+
+
+Final$LEVEL <- NULL
+names(Final) <- c("Year", "FIPScounty", "ICPSRstate", "TOTPOP", "TOTAREA", "AvgFarmVal")
+
+
+
+############### MERGING WITH THE FINAL DATASET
+Merge1930 <- subset(data3072, Year == 1928)
+Merge1930$Year <- 1930
+
+Merge1940 <- subset(data3072, Year == 1940)
+Merge1940$Year <- 1940
+
+Merge1945 <- subset(data3072, Year == 1944)
+Merge1945$Year <- 1945
+
+Merge1950 <- subset(data3072, Year == 1948)
+Merge1950$Year <- 1950
+
+Merge1954 <- subset(data3072, Year == 1952)
+Merge1954$Year <- 1954
+
+Merge1959 <- subset(data3072, Year == 1960)
+Merge1959$Year <- 1959
+
+Merge1964 <- subset(data3072, Year == 1964)
+Merge1964$Year <- 1964
+
+Merge1969 <- subset(data3072, Year == 1968)
+Merge1969$Year <- 1969
+
+Merge1974 <- subset(data3072, Year == 1972)
+Merge1974$Year <- 1974
+
+FinalMerge <- rbind(Merge1930,Merge1940,Merge1945,Merge1950,Merge1954,Merge1959,Merge1964,Merge1969,Merge1974,use.names = TRUE, fill=TRUE)
+
+
+
+
+                  
+# merge 3072 with the agriculture data
+#Final$ICPSRcounty <- as.character(unlist(Final[,"ICPSRcounty"]))
+#Final$ICPSRstate <- as.numeric(unlist(Final[,"ICPSRstate"]))
+#Final$Year <- as.numeric(unlist(Final[,"Year"]))
+FinalMerge <- merge(FinalMerge,Final,by = c("FIPScounty","ICPSRstate","Year"),all.x = TRUE)
+
+FinalMergePresidental <- subset(FinalMerge, Type == 1)
+FinalMergeCongress <- subset(FinalMerge, Type == 2)
+
+
+### Running regressions (presidental)
+fit1 <- lm(AvgFarmVal ~ Dem + TOTAREA + TOTPOP + factor(Year) + factor(FIPScounty) , data = FinalMergePresidental)
+summary(fit1)
+
+
+# 26. Save as .csv ####
+write.csv2(x=Final2, file="Final2.csv", row.names=FALSE)
+
+
+
+
+
+fit <- lm(HARVEST ~ FARMLAND + DEM,FINAL)
+fit1 <- lm(DEM ~ REP + TO +factor(STATE)+factor(YEAR),data = election)
+
+
+# Delete reduntant dataframes
+rm(data3072_1)
+rm(data3072_2)
+rm(dem28pres)
+rm(dem30cong)
+rm(dem32pres)
+rm(dem40cong)
+rm(dem40pres)
+rm(dem42cong)
+rm(dem44cong)
+rm(dem44pres)
+rm(dem46cong)
+rm(dem48cong)
+rm(dem48pres)
+rm(dem50cong)
+rm(dem52pres)
+rm(dem52cong)
+rm(dem54cong)
+rm(dem56cong)
+rm(dem56pres)
+rm(dem58cong)
+rm(dem60cong)
+rm(dem60pres)
+rm(dem62cong)
+rm(dem64cong)
+rm(dem64pres)
+rm(dem66cong)
+rm(dem68cong)
+rm(dem68pres)
+rm(dem70cong)
+rm(dem72cong)
+rm(dem72pres)
+
+rm(rep28pres)
+rm(rep30cong)
+rm(rep32pres)
+rm(rep40cong)
+rm(rep40pres)
+rm(rep42cong)
+rm(rep44cong)
+rm(rep44pres)
+rm(rep46cong)
+rm(rep48cong)
+rm(rep48pres)
+rm(rep50cong)
+rm(rep52pres)
+rm(rep52cong)
+rm(rep54cong)
+rm(rep56cong)
+rm(rep56pres)
+rm(rep58cong)
+rm(rep60cong)
+rm(rep60pres)
+rm(rep62cong)
+rm(rep64cong)
+rm(rep64pres)
+rm(rep66cong)
+rm(rep68cong)
+rm(rep68pres)
+rm(rep70cong)
+rm(rep72cong)
+rm(rep72pres)
