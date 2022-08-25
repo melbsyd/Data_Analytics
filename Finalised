@@ -1,18 +1,21 @@
 # Part 1 ####
 
+# Tasks for the Part 1
 # Compile the panel data set for every county (FIPS) and year
 # Only take the variables you need.
 # Main outcome variables should relate to "Farm Performance". Limit yourself to 1-4 variables!
-  
 # Create one Output file in "Data/Processing/ICPSR_35206/Final".
 
 
 # Part 2 ####
 
+# Tasks for the Part 2
+# Having a dataset containing 1. fips, 2. year, 3. state, 4. pop, 5. area and 6. our dependent variable, we will estimate what is the true impact of Democrats on farm performance.
 
 
 
 
+# General setup
 rm(list=ls(all=T)) # Delete all present objects in the workspace
 setwd("/Users/tomasnovak/Desktop/Agriculture") # Set a working directory
 
@@ -36,16 +39,16 @@ install.packages("purrr")
 
 
 # 2. Read the packages we want ####
-library(data.table)
-library(haven)
-library(dplyr)
-library(tidyr)
-library(readxl)
-library(ggplot2)
-library(plm)
-library(stringr)
-library(MAP)
-library(purrr)
+library(data.table) # used for fast aggregation of large datasets, low latency add/update/remove of columns, quicker ordered joins, and a fast file reader
+library(haven) # enables R to read and write various data formats used by other statistical packages 
+library(dplyr) # allows you to read and write SAS, SPSS, and Stata data formats
+library(tidyr) # makes importing, wrangling, analyzing, and visualizing data easier
+library(readxl) # read excel files
+library(ggplot2) # for nice plotting later on
+library(plm) # provides functions to estimate a wide variety of models and to make (robust) inference
+library(stringr) # provide a cohesive set of functions designed to make working with strings as easy as possible
+library(MAP) # contains a lot of outlines of continents, countries, states, and counties
+library(purrr) # enhances the functional programming aspect of R by providing different methods to work with functions and vectors
 
 # 3. Load data ####
 # 3.1 Load agriculture data for years from 1925 to 1974 ####
@@ -62,15 +65,16 @@ data1964_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR
 data1969_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0033/35206-0033-Data.dta")
 data1974_1 <- read_dta("/Users/tomasnovak/Desktop/Agriculture/DataForWeek1/ICPSR_35206/DS0036/35206-0036-Data.dta")
 
-# 3.2 Load this file to convert the state codes to their names and later to convert the information in the election data to FIPS ####
+# 3.2 Load this file "state to fips" to convert the state codes to their names and later to convert the information in the election data to FIPS ####
 state_to_fips <- read_excel("StateFIPSicsprAB.xls")
+
 
 
 # Part 1 ####
 
 
 
-# 4. Check the data structure ####
+# 4. Check the data structure (to get an idea of what the data look like)####
 str(data1925_1)
 str(data1930_1)
 str(data1940_1)
@@ -85,7 +89,7 @@ str(data1969_1)
 str(data1974_1)
 
 
-# 5. Add column "YEAR" ####
+# 5. Add a new column "YEAR" ####
 data1925_1 <- cbind(YEAR = 1925, data1925_1)
 data1930_1 <- cbind(YEAR = 1930, data1930_1)
 data1940_1 <- cbind(YEAR = 1940, data1940_1)
@@ -100,7 +104,7 @@ data1969_1 <- cbind(YEAR = 1969, data1969_1)
 data1974_1 <- cbind(YEAR = 1974, data1974_1)
 
 
-# 6. Extract the County Level Data ####
+# 6. Extract the County Level Data (Level 1 = county)####
 data1925_1 <- subset(data1925_1, LEVEL == 1)
 data1930_1 <- subset(data1930_1, LEVEL == 1)
 data1940_1 <- subset(data1940_1, LEVEL == 1)
@@ -115,7 +119,7 @@ data1969_1 <- subset(data1969_1, LEVEL == 1)
 data1974_1 <- subset(data1974_1, LEVEL == 1)
 
 
-# 7. Rename Columns ####
+# 7. Rename Columns we are interested in####  (TOTPOP = total population, FarmVal = Farm Value (Buildings & Land), FarmNumber = number of farms in the county, AvgFarmVal = average value per farm (buildings & land) per county)
 data1925_1 <- rename(data1925_1, TOTPOP = VAR1)
 data1925_1 <- rename(data1925_1, FarmVal = VAR125)
 data1925_1 <- rename(data1925_1, FarmNumber = VAR2)
@@ -167,17 +171,17 @@ data1969_1 <- rename(data1969_1, TOTAREA = ITEM01004)
 data1974_1 <- rename(data1974_1, AvgFarmVal = ITEM01007)
 data1974_1 <- rename(data1974_1, TOTAREA = ITEM01004)
 
-# 8. Merge Data Files to Get Missing FIPS ####
+# 8. Merge two different Data Files for twice the same year to Get Missing FIPS ####
 data1954_1 <- left_join(data1954_1, data1954_2, by=c("FARM_LAND_ACR", "HARVEST_CROPLAND"))
 data1959_1 <- left_join(data1959_1, data1959_2, by=c("FARM_LAND_ACR", "HARVEST_CROPLAND"))
 
 
-# 9. Remove data you don't need anymore ####
+# 9. Remove datafiles you don't need anymore ####
 rm(data1954_2)
 rm(data1959_2)
 
 
-# 10. Extract the Variables You Want ####
+# 10. Extract the Variables You Are Interested In ####
 data1925_1 <- data1925_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "FarmVal", "FarmNumber")] 
 data1930_1 <- data1930_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "FarmVal", "FarmNumber")] 
 data1940_1 <- data1940_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTPOP", "TOTAREA", "FarmVal", "FarmNumber")] 
@@ -190,7 +194,7 @@ data1969_1 <- data1969_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTAREA", "AvgFar
 data1974_1 <- data1974_1[, c("YEAR","FIPS", "STATE", "LEVEL", "TOTAREA", "AvgFarmVal")] 
 
 
-# 11. Search for colnames (exist?) ####
+# 11. Check whether we have the FIPS column now after we have merged those two datafiles ####
 "FIPS" %in% names(data1964_1)
 
 
@@ -246,28 +250,30 @@ data1974_1 <- data1974_1 %>% drop_na(TOTAREA, AvgFarmVal)
 data1974_1 <- data1974_1[data1974_1$AvgFarmVal != 0, ]
 data1974_1 <- data1974_1[data1974_1$TOTAREA != 0, ]
 
-# 13. Add the Column "TOTPOP" to 1969_1 ####
+# 14. Add the Column "TOTPOP" to 1969_1 ####
 data1969_1[,"TOTPOP"] <- NA
 
-
-# 14. Add the Column "TOTPOP" to 1974_1 ####
+# 15. Add the Column "TOTPOP" to 1974_1 ####
 data1974_1[,"TOTPOP"] <- NA
 
-# 14. Add the Column "AvgFarmVal" to 1925_1 ####
+# 16. Add the Column "AvgFarmVal" to 1925_1 ####
 data1925_1[,"AvgFarmVal"] <- NA
 
-# 14. Add the Column "AvgFarmVal" to 1930_1 ####
+# 17. Add the Column "AvgFarmVal" to 1930_1 ####
 data1930_1[,"AvgFarmVal"] <- NA
 
-# 14. Add the Column "AvgFarmVal" to 1940_1 ####
+# 18. Add the Column "AvgFarmVal" to 1940_1 ####
 data1940_1[,"AvgFarmVal"] <- NA
 
-# 16. Fill the two newly added columns by: (FarmVal / FarmNumber)
+# 19. Fill the 
+
+# 19. Fill the three newly added columns "AvgFarmVal" by: (FarmVal / FarmNumber). This will get us the same value as we have for the years later, such as Average Value Per Farm (Buildings & Land).  ####
 data1925_1$AvgFarmVal <- data1925_1$FarmVal/data1925_1$FarmNumber
 data1930_1$AvgFarmVal <- data1930_1$FarmVal/data1930_1$FarmNumber
 data1940_1$AvgFarmVal <- data1940_1$FarmVal/data1940_1$FarmNumber
 
-# 17. Delete the reduntant column in 1930_1 and 1940_1
+
+# 20. Delete the reduntant column in 1930_1 and 1940_1  ####
 data1925_1$FarmVal <- NULL
 data1925_1$FarmNumber <- NULL
 data1930_1$FarmVal <- NULL
@@ -275,7 +281,8 @@ data1930_1$FarmNumber <- NULL
 data1940_1$FarmVal <- NULL
 data1940_1$FarmNumber <- NULL
 
-# 15. Change the New "colnames" after merging ####
+
+# 21. Change the New "colnames" after merging ####
 data1954_1 <- rename(data1954_1, YEAR = YEAR.x)
 data1954_1 <- rename(data1954_1, STATE = STATEICP)
 data1954_1 <- rename(data1954_1, LEVEL = LEVEL.x)
@@ -285,7 +292,7 @@ data1959_1 <- rename(data1959_1, STATE = STATEICP)
 data1959_1 <- rename(data1959_1, LEVEL = LEVEL.x)
 
 
-# 16. Check the Data to See if it Fits ####
+# 22. Check the Data to See if it Fits ####
 summary(data1925_1)
 summary(data1930_1)
 summary(data1940_1)
@@ -298,51 +305,52 @@ summary(data1969_1)
 summary(data1974_1)
 
 
-# 17. Merge the datasets into "File" ####
-Final <- rbind(data1925_1, data1930_1, data1940_1, data1945_1, data1950_1, data1954_1, data1959_1, data1964_1, data1969_1, data1974_1) # Row bind
+# 23. Merge the data sets we have created into one data set called: "File" ####
+Final <- rbind(data1925_1, data1930_1, data1940_1, data1945_1, data1950_1, data1954_1, data1959_1, data1964_1, data1969_1, data1974_1) # Merges by Row
 
 
-# 18. Delete observations with state code = 98 ("ICPSRStateCodeList" contains only 82 state codes) ####
+# 24. Delete observations with state code = 98 ("ICPSRStateCodeList" contains only 82 state codes) ####
 Final <- Final[Final$STATE != 98, ]
 
 
-# 19. "state_to_fips": Rename column "STICPSR" to STATE
+# 25. "state_to_fips": Rename column "STICPSR" to STATE  ####
 state_to_fips <- rename(state_to_fips, STATE = STICPSR)
 
 
-# 23. Remove  redundant columns in "state_to_fips"
+# 26. Remove redundant columns in "state_to_fips"  ####
 state_to_fips$FIPS <- NULL
 state_to_fips$NAME <- NULL
 state_to_fips$STNAME <- NULL
 
 
-# 20. Merge the "Final" dataset with the "state_to_fips" dataset to get the state names from its state codes
+# 27. Merge the "Final" dataset with the "state_to_fips" dataset to get the state names from its state codes  ####
 Final <- left_join(Final, state_to_fips, by=c("STATE"))
 
 
-# 23. Remove  dataframe "state_to_fips"
+# 28. Remove the dataframe "state_to_fips"  ####
 rm(state_to_fips)
 
 
-# 21. Get the state names 
-# Final$STATE <- ifelse(is.na(Final$AB), Final$STATE, Final$AB)
+# 29. Get the state names 
+# Final$STATE <- ifelse(is.na(Final$AB), Final$STATE, Final$AB)  ####
 
 
-# 23. Remove  redundant column in "Final"
+# 30. Remove  redundant column "AB" in "Final"  ####
 Final$AB <- NULL
 
-# 24. Remove an error value (avg )
+
+# 31. Remove an error observation (after checking, the values are an error (999...))   ####
 Final[27236, ] <- NA
 
 
-# 24. check structure ####
+# 32. Check structure of the Final data file####
 str(Final)
 # look around in the viewer, check stuff like:
 unique(Final[, "STATE"]) # Prints unique state names in our dataframe
 summary(Final) # Summary table of our dataframe
 
 
-# 25. Plot "Final" variables distribution
+# 33. Plot "Final" variables distribution
 ggplot(data.frame(Final), aes(TOTPOP)) +               # Histogram with log10 axis
   geom_histogram(bins = 100) +
   scale_x_log10() 
@@ -359,10 +367,10 @@ ggplot(data.frame(Final), aes(AvgFarmVal)) +               # Histogram with log1
 
 
 
-# 26. Save as .csv ####
+# 34. Save as .csv ####
 write.csv2(x=Final, file="Final.csv", row.names=FALSE)
 
-# 27. Delete dataframes we don't need ####
+# 35. Delete dataframes we don't need ####
 rm(data1925_1)
 rm(data1930_1)
 rm(data1940_1)
@@ -380,40 +388,43 @@ rm(data1974_1)
 
 
 
-# Main Question: How does Democrat's election results affect farm performance?
+# Main Question: How does Democrat's election results affect farm performance ("AvgFarmVal")?
 
 
-# 27. Load the election data ####
+
+# 36. Load the election data ####
 election_data <- read_dta("ElectionData/ICPSR_08611/08611-0001-Data.dta")
 
 
-# 28. Check structure of the election data ####
+# 37. Check structure of the election data ####
 str(election_data)
 
 
-# 29. Load the "state_to_fips" data
+# 38. Load the "state_to_fips" data
 state_to_fips <- read_excel("StateFIPSicsprAB.xls")
 
 
-# 30. Check structure of the "state_to_fips"  ####
+# 39. Check structure of the "state_to_fips"  data file ####
 str(state_to_fips)
 
-# 31. Load the "transfer" data
+# 40. Load the "transfer" data
 transfer <- read_dta("transfer/transfer.dta")
 
 
-# 32. Check structure of the "state_to_fips"  ####
+# 41. Check structure of the "trasfer" data file ####
 str(transfer)
 
 
-# 31. 
+# 42. Convert a list to vector ####
 num_cols <- unlist(lapply(election_data, is.numeric))
 
 
+# 43. Extract numeric and non_numeric values ####
 election_data_non_numeric <- election_data[ , !num_cols]
 election_data_numeric <- election_data[ , num_cols]
 
 
+# 44. Remove outliers ####
 election_data_numeric[trunc(election_data_numeric) == 999] <- NA_real_
 election_data_numeric[trunc(election_data_numeric) == 9999] <- NA_real_
 election_data_numeric[trunc(election_data_numeric) == 99999] <- NA_real_
@@ -1147,6 +1158,14 @@ FinalMergeCongress <- subset(FinalMerge, Type == 2)
 ### Running regressions (presidental)
 fit1 <- lm(AvgFarmVal ~ Dem + TOTAREA + TOTPOP + factor(Year) + factor(FIPScounty) , data = FinalMergePresidental)
 summary(fit1)
+
+fit3 <- lm(AvgFarmVal ~ Dem + TOTAREA + TOTPOP + factor(Year) + factor(FIPScounty) + factor(State), data = FinalMergePresidental)
+summary(fit3)
+
+
+### Running regressions (congress)
+fit2 <- lm(AvgFarmVal ~ Dem + TOTAREA + TOTPOP + factor(Year) + factor(FIPScounty) , data = FinalMergeCongress)
+summary(fit2)
 
 
 # 26. Save as .csv ####
